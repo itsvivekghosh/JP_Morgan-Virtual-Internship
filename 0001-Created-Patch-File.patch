@@ -1,0 +1,73 @@
+From 20b309de6bc2959aef724fe7b1d23382ea572d14 Mon Sep 17 00:00:00 2001
+From: itsvivekghosh <soapmactevis1@gmail.com>
+Date: Thu, 25 Jun 2020 08:58:15 +0000
+Subject: [PATCH] Created Patch File
+
+---
+ client3.py | 31 ++++++++++++++++++-------------
+ server3.py |  1 +
+ 2 files changed, 19 insertions(+), 13 deletions(-)
+
+diff --git a/client3.py b/client3.py
+index f1771c3..7832b17 100644
+--- a/client3.py
++++ b/client3.py
+@@ -35,25 +35,30 @@ def getDataPoint(quote):
+ 	stock = quote['stock']
+ 	bid_price = float(quote['top_bid']['price'])
+ 	ask_price = float(quote['top_ask']['price'])
+-	price = bid_price
++	price = (bid_price + ask_price) / 2
+ 	return stock, bid_price, ask_price, price
+ 
+ def getRatio(price_a, price_b):
+-	""" Get ratio of price_a and price_b """
+-	""" ------------- Update this function ------------- """
+-	""" Also create some unit tests for this function in client_test.py """
+-	return 1
++
++    """ Get ratio of price_a and price_b """
++    """ ------------- Update this function ------------- """
++    """ Also create some unit tests for this function in client_test.py """
++    if(price_b == 0):
++      return
++    return (price_a / price_b)
+ 
+ # Main
+ if __name__ == "__main__":
+ 
+-	# Query the price once every N seconds.
+-	for _ in iter(range(N)):
+-		quotes = json.loads(urllib.request.urlopen(QUERY.format(random.random())).read())
++    # Query the price once every N seconds.
++    for _ in range(N):
++      quotes = json.loads(urllib.request.urlopen(QUERY.format(random.random())).read())
+ 
+-		""" ----------- Update to get the ratio --------------- """
+-		for quote in quotes:
+-			stock, bid_price, ask_price, price = getDataPoint(quote)
+-			print ("Quoted %s at (bid:%s, ask:%s, price:%s)" % (stock, bid_price, ask_price, price))
++      """ ----------- Update to get the ratio --------------- """
++      prices = {}
++      for quote in quotes:
++        stock, bid_price, ask_price, price = getDataPoint(quote)
++        prices[stock] = price
++        print ("Quoted %s at (bid:%s, ask:%s, price:%s)" % (stock, bid_price, ask_price, price))
+ 
+-		print ("Ratio %s" % getRatio(price, price))
++      print ("Ratio %s" % getRatio(prices['ABC'], prices['DEF']))
+diff --git a/server3.py b/server3.py
+index 704aa41..414d832 100644
+--- a/server3.py
++++ b/server3.py
+@@ -275,6 +275,7 @@ class App(object):
+         try:
+             t1, bids1, asks1 = next(self._current_book_1)
+             t2, bids2, asks2 = next(self._current_book_2)
++            
+         except Exception as e:
+             print ("error getting stocks...reinitalizing app")
+             self.__init__()
+-- 
+2.17.1
+
